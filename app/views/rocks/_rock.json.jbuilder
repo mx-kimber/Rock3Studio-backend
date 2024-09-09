@@ -1,2 +1,8 @@
-json.extract! rock, :id, :rock_name, :type, :weight, :weight_unit, :location, :price, :date_acquired, :notes, :color, :condition, :dimensions, :source, :category, :hardness, :created_at, :updated_at
-json.url rock_url(rock, format: :json)
+json.extract! rock, :id, :rock_name, :material, :weight, :weight_unit, :location, :price, :notes, :color, :condition, :dimensions, :source, :category, :hardness, :created_at, :updated_at
+
+json.photos rock.photos do |photo|
+  json.id photo.id
+  json.url photo.url
+  json.created_at photo.created_at
+  json.updated_at photo.updated_at
+end

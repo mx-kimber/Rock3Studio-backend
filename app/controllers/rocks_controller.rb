@@ -65,6 +65,6 @@ class RocksController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def rock_params
-      params.require(:rock).permit(:rock_name, :type, :weight, :weight_unit, :location, :date_acquired, :notes, :color, :condition, :dimensions, :source, :category, :hardness, :price,)
+      params.permit(:rock_name, :material, :weight, :weight_unit, :location, :date_acquired, :notes, :color, :condition, :dimensions, :source, :category, :hardness, :price,)
     end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_09_09_223329) do
+ActiveRecord::Schema[7.1].define(version: 2024_09_09_232102) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -24,11 +24,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_09_223329) do
 
   create_table "rocks", force: :cascade do |t|
     t.string "rock_name"
-    t.string "type"
+    t.string "material"
     t.decimal "weight"
     t.string "location"
     t.decimal "price"
-    t.date "date_acquired"
     t.text "notes"
     t.string "color"
     t.string "condition"
@@ -36,7 +35,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_09_223329) do
     t.string "source"
     t.string "category"
     t.decimal "hardness"
-    t.string "tags"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "weight_unit"
