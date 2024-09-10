@@ -1,5 +1,6 @@
 class PhotosController < ApplicationController
   before_action :set_photo, only: %i[ show update destroy ]
+
   def index
     @photos = Photo.all
     render json: @photos
@@ -10,7 +11,15 @@ class PhotosController < ApplicationController
   end
 
   def create
-    @photo = Photo.new(photo_params)
+
+    if photo_params[:rock_id].present?
+      rock = Rock.find_or_initialize_by(id: photo_params[:rock_id])
+    else
+      rock = Rock.create!(rock_params_for_rock)
+    end
+
+    @photo = rock.photos.build(photo_params.except(:rock_id))
+
     if @photo.save
       render json: @photo, status: :created
     else
@@ -39,5 +48,9 @@ class PhotosController < ApplicationController
 
     def photo_params
       params.permit(:rock_id, :url)
+    end
+
+    def rock_params_for_rock
+      params.permit(:rock_name, :material, :weight, :weight_unit, :location, :notes, :color, :condition, :dimensions, :source, :category, :hardness, :price)
     end
 end
