@@ -1,43 +1,40 @@
 class UsersController < ApplicationController
   before_action :authenticate_user, except: [:create]
+  before_action :set_current_user, only: [:show, :update, :destroy]
 
   def index
     if current_user
-      render json: current_user.as_json(include: { rocks: { include: :photos } })
+      @users = User.includes(rocks: :photos).all
+      render json: @users.as_json(include: { rocks: { include: :photos } }), status: :ok
     else
       render json: { error: "Unauthorized access" }, status: :unauthorized
     end
   end
-  
-def show
-  if current_user
-    @user = current_user
-    render :show
-  else
-    render json: { error: "Unauthorized access" }, status: :unauthorized
-  end
-end
 
-def create
-  @user = User.new(user_params)
-  if @user.save
-    render json: @user.as_json(include: { rocks: { include: :photos } }), status: :created
-  else
-    render json: { errors: @user.errors.full_messages }, status: :bad_request
+  def show
+    render json: @user
   end
-end
+
+  def create
+    @user = User.new(user_params)
+
+    if @user.save
+      render :show, status: :created
+    else
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
 
   def update
-    if current_user.update(user_params)
-      render json: current_user.as_json(include: { rocks: { include: :photos } }), status: :ok
+    if @user.update(user_params)
+      render json: @user, status: :ok
     else
-      render json: { errors: current_user.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   def destroy
-    if @user = current_user
-      @user.destroy
+    if @user.destroy
       render json: { message: "User destroyed successfully" }
     else
       render json: { error: "User not found" }, status: :not_found
@@ -45,6 +42,11 @@ end
   end
 
   private
+
+
+  def set_current_user
+    @user = current_user
+  end
 
   def user_params
     params.permit(:full_name, :user_name, :email, :password, :password_confirmation)

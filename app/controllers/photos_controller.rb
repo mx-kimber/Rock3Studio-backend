@@ -1,8 +1,10 @@
 class PhotosController < ApplicationController
+  before_action :authenticate_user
+  before_action :set_current_user
   before_action :set_photo, only: %i[show update destroy]
-
+  
   def index
-    @photos = current_user.photos.includes(:rock)
+    @photos = @user.photos.includes(:rock)
     render json: @photos
   end
   
@@ -12,16 +14,16 @@ class PhotosController < ApplicationController
 
   def create
     if photo_params[:rock_id].present?
-      rock = current_user.rocks.find_by(id: photo_params[:rock_id])
+      rock = @user.rocks.find_by(id: photo_params[:rock_id])
       unless rock
         render json: { error: "Rock not found or doesn't belong to the user" }, status: :not_found and return
       end
     else
-      rock = current_user.rocks.create!(rock_params_for_rock)
+      rock = @user.rocks.create!(rock_params_for_rock)
     end
 
     @photo = rock.photos.build(photo_params.except(:rock_id))
-    @photo.user = current_user
+    @photo.user = @user
 
     if @photo.save
       render json: @photo, status: :created
@@ -43,20 +45,23 @@ class PhotosController < ApplicationController
     render json: { message: "Photo has been deleted" }, status: :ok
   end
   
-
   private
 
-    def set_photo
-      @photo = current_user.photos.find(params[:id])
-    rescue ActiveRecord::RecordNotFound
-      render json: { error: "Photo not found or doesn't belong to the user" }, status: :not_found
-    end
+  def set_current_user
+    @user = current_user
+  end
 
-    def photo_params
-      params.permit(:rock_id, :url)
-    end
+  def set_photo
+    @photo = @user.photos.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: "Photo not found or doesn't belong to the user" }, status: :not_found
+  end
 
-    def rock_params_for_rock
-      params.permit(:rock_name, :material, :weight, :weight_unit, :location, :notes, :color, :condition, :dimensions, :source, :category, :hardness, :price)
-    end
+  def photo_params
+    params.permit(:rock_id, :url)
+  end
+
+  def rock_params_for_rock
+    params.permit(:rock_name, :material, :weight, :weight_unit, :location, :notes, :color, :condition, :dimensions, :source, :category, :hardness, :price)
+  end
 end
