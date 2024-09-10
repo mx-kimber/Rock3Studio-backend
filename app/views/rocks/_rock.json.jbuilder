@@ -1,4 +1,4 @@
-json.extract! rock, :id, :rock_name, :material, :weight, :weight_unit, :location, :price, :notes, :color, :condition, :dimensions, :source, :category, :hardness, :created_at, :updated_at
+json.extract! rock, :id, :rock_name, :material, :weight, :weight_unit, :location,  :notes, :color, :condition, :dimensions, :source, :category, :hardness, :price, :created_at, :updated_at
 
 json.photos rock.photos do |photo|
   json.id photo.id
