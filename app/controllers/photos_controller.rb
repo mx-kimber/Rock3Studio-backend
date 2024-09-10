@@ -1,8 +1,8 @@
 class PhotosController < ApplicationController
-  before_action :set_photo, only: %i[ show update destroy ]
+  before_action :set_photo, only: %i[show update destroy]
 
   def index
-    @photos = Photo.all
+    @photos = current_user.photos.includes(:rock)
     render json: @photos
   end
   
@@ -11,11 +11,14 @@ class PhotosController < ApplicationController
   end
 
   def create
-
     if photo_params[:rock_id].present?
-      rock = Rock.find_or_initialize_by(id: photo_params[:rock_id])
+      rock = current_user.rocks.find_by(id: photo_params[:rock_id])
+      unless rock
+        render json: { error: "Rock not found or doesn't belong to the user" }, status: :not_found and return
+      end
     else
-      rock = Rock.create!(rock_params_for_rock)
+   
+      rock = current_user.rocks.create!(rock_params_for_rock)
     end
 
     @photo = rock.photos.build(photo_params.except(:rock_id))
@@ -43,7 +46,9 @@ class PhotosController < ApplicationController
   private
 
     def set_photo
-      @photo = Photo.find(params[:id])
+      @photo = current_user.photos.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: "Photo not found or doesn't belong to the user" }, status: :not_found
     end
 
     def photo_params
