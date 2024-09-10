@@ -17,11 +17,11 @@ class PhotosController < ApplicationController
         render json: { error: "Rock not found or doesn't belong to the user" }, status: :not_found and return
       end
     else
-   
       rock = current_user.rocks.create!(rock_params_for_rock)
     end
 
     @photo = rock.photos.build(photo_params.except(:rock_id))
+    @photo.user = current_user
 
     if @photo.save
       render json: @photo, status: :created
@@ -40,8 +40,9 @@ class PhotosController < ApplicationController
 
   def destroy
     @photo.destroy!
-    head :no_content
+    render json: { message: "Photo has been deleted" }, status: :ok
   end
+  
 
   private
 
