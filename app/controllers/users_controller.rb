@@ -43,12 +43,15 @@ class UsersController < ApplicationController
 
   private
 
-
   def set_current_user
     @user = current_user
   end
 
   def user_params
-    params.permit(:full_name, :user_name, :email, :password, :password_confirmation)
+    if action_name == 'create'
+      params.permit(:full_name, :user_name, :email, :password, :password_confirmation)
+    else
+      params.permit(:full_name, :user_name, :email, :password, :password_confirmation)
+    end
   end
 end
